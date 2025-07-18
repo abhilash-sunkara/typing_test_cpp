@@ -24,6 +24,20 @@ string generate_reference_string(){
     return ref_string.substr(1);
 }
 
+string generate_reference_string(int num_times){
+    srand(time(0));
+
+    string ref_string = "";
+
+    for(int i = 0; i < num_times; i++){
+        int remove_index = rand() % words.size();
+        ref_string.append(words.at(remove_index));
+        words.erase(words.begin() + remove_index);
+    }
+
+    return ref_string.substr(1);
+}
+
 /* int main(){
     cout << generate_reference_string() << endl;
 } */
