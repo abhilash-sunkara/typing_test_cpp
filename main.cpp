@@ -1,5 +1,3 @@
-using namespace std;
-
 #include <stdio.h>
 #include <cstring>
 #include <string>
@@ -7,13 +5,41 @@ using namespace std;
 #include <chrono>
 #include "string_generator.cpp"
 #include "file_storage.cpp"
+#include "CLI11.hpp"
 
-float compare_accuracy(string, string);
+float compare_accuracy(std::string, std::string);
 float getWPM(float, float);
-int is_num(string);
+int is_num(std::string);
+void run_typingtest(int);
+void run_total_runs();
+void run_accuracy();
+void run_wpm();
 
 
 int main(int argc, char* argv[]){
+
+    CLI::App app{"Typing Test"};
+
+    int num_words = -1;
+
+    auto run = app.add_subcommand("run", "Run a typing test");
+    auto total_runs = app.add_subcommand("total_runs", "Get total number of typing test runs");
+    auto accuracy = app.add_subcommand("accuracy", "Gets average accuracy from all typing test runs");
+    auto wpm = app.add_subcommand("wpm", "Gets average wpm from all typing test runs");
+
+    run->add_option("num_words", num_words, "Number of words to be used for typing test")->default_val(-1);
+
+    CLI11_PARSE(app, argc, argv);
+
+    if(*run){
+        run_typingtest(num_words);
+    } else if(*total_runs){
+        run_total_runs();
+    } else if(*accuracy){
+        run_accuracy();
+    } else if(*wpm){
+        run_wpm();
+    }
 
     /* if(argc > 2 && !strcmp(argv[1], "echo")){
         cout << argv[2] << endl;
@@ -28,66 +54,96 @@ int main(int argc, char* argv[]){
     } */
     
 
-    if(argc == 1){
-        cout << "No parameters specified" << endl;
+    /*if(argc == 1){
+        std::cout << "No parameters specified" << std::endl;
     } else if(argc > 1 && !strcmp(argv[1], "accuracy")){
-        cout << "Your average accuracy is: "  << get_avg_accuracy() << endl;
+        std::cout << "Your average accuracy is: "  << get_avg_accuracy() << std::endl;
     } else if(argc > 1 && !strcmp(argv[1], "total_runs")){
-        cout << get_num_runs() << endl;
+        std::cout << get_num_runs() << std::endl;
     } else if(argc > 1 && !strcmp(argv[1], "wpm")){
-        cout << "Your average wpm is: " <<  get_avg_wpm() << endl;
+        std::cout << "Your average wpm is: " <<  get_avg_wpm() << std::endl;
     } else if(argc == 2 && !strcmp(argv[1], "run")){
-        string ref_str = generate_reference_string();
-        cout << "Your sentence is: " << ref_str << endl;
-        string ans_str;
-        auto start = chrono::high_resolution_clock::now();
-        getline(cin, ans_str);
-        auto end = chrono::high_resolution_clock::now();
-        const chrono::duration<double> elapsed_time = end - start;
+        std::string ref_str = generate_reference_string();
+        std::cout << "Your sentence is: " << ref_str << std::endl;
+        std::string ans_str;
+        auto start = std::chrono::high_resolution_clock::now();
+        getline(std::cin, ans_str);
+        auto end = std::chrono::high_resolution_clock::now();
+        const std::chrono::duration<double> elapsed_time = end - start;
         float accuracy = compare_accuracy(ref_str, ans_str);
-        cout << "Your accuracy is: " << accuracy * 100 << "%, in " << elapsed_time.count() << "s" << endl;
-        cout << "Your calculated WPM is: " << getWPM(elapsed_time.count(), ref_str.length() / 5.0) << endl;
-        string result;
-        result.append(to_string(accuracy * 100));
+        std::cout << "Your accuracy is: " << accuracy * 100 << "%, in " << elapsed_time.count() << "s" << std::endl;
+        std::cout << "Your calculated WPM is: " << getWPM(elapsed_time.count(), ref_str.length() / 5.0) << std::endl;
+        std::string result;
+        result.append(std::to_string(accuracy * 100));
         result.append(", ");
-        result.append(to_string(getWPM(elapsed_time.count(), ref_str.length() / 5.0)));
+        result.append(std::to_string(getWPM(elapsed_time.count(), ref_str.length() / 5.0)));
         result.append("\n");
         write_to_file(result);
     } else if(argc == 3 && !strcmp(argv[1], "run")){
         char* p;
         int num = strtol(argv[2], &p, 10);
         if(*p){
-            cout << "Input for number of words is nonnumeric" << endl;
+            std::cout << "Input for number of words is nonnumeric" << std::endl;
         } else {
             if(num > (int) words.size()){
-                cout << "Input for number of words is incorrect" << endl;
+                std::cout << "Input for number of words is incorrect" << std::endl;
                 return 0;
             }
-            string ref_str = generate_reference_string(num);
-            cout << "Your sentence is: " << ref_str << endl;
-            string ans_str;
-            auto start = chrono::high_resolution_clock::now();
-            getline(cin, ans_str);
-            auto end = chrono::high_resolution_clock::now();
-            const chrono::duration<double> elapsed_time = end - start;
+            std::string ref_str = generate_reference_string(num);
+            std::cout << "Your sentence is: " << ref_str << std::endl;
+            std::string ans_str;
+            auto start = std::chrono::high_resolution_clock::now();
+            getline(std::cin, ans_str);
+            auto end = std::chrono::high_resolution_clock::now();
+            const std::chrono::duration<double> elapsed_time = end - start;
             float accuracy = compare_accuracy(ref_str, ans_str);
-            cout << "Your accuracy is: " << accuracy * 100 << "%, in " << elapsed_time.count() << "s" << endl;
-            cout << "Your calculated WPM is: " << getWPM(elapsed_time.count(), ref_str.length() / 5.0) << endl;
-            string result;
-            result.append(to_string(accuracy * 100));
+            std::cout << "Your accuracy is: " << accuracy * 100 << "%, in " << elapsed_time.count() << "s" << std::endl;
+            std::cout << "Your calculated WPM is: " << getWPM(elapsed_time.count(), ref_str.length() / 5.0) << std::endl;
+            std::string result;
+            result.append(std::to_string(accuracy * 100));
             result.append(", ");
-            result.append(to_string(getWPM(elapsed_time.count(), ref_str.length() / 5.0)));
+            result.append(std::to_string(getWPM(elapsed_time.count(), ref_str.length() / 5.0)));
             result.append("\n");
             write_to_file(result);
         }
     }
     else{
-        cout << "Invalid argument: " << argv[1] << endl;
-    }
+        std::cout << "Invalid argument: " << argv[1] << std::endl;
+    } */
 } 
 
+void run_typingtest(int num_words){
+    std::string ref_str = generate_reference_string(num_words);
+    std::cout << "Your sentence is: " << ref_str << std::endl;
+    std::string ans_str;
+    auto start = std::chrono::high_resolution_clock::now();
+    getline(std::cin, ans_str);
+    auto end = std::chrono::high_resolution_clock::now();
+    const std::chrono::duration<double> elapsed_time = end - start;
+    float accuracy = compare_accuracy(ref_str, ans_str);
+    std::cout << "Your accuracy is: " << accuracy * 100 << "%, in " << elapsed_time.count() << "s" << std::endl;
+    std::cout << "Your calculated WPM is: " << getWPM(elapsed_time.count(), ref_str.length() / 5.0) << std::endl;
+    std::string result;
+    result.append(std::to_string(accuracy * 100));
+    result.append(", ");
+    result.append(std::to_string(getWPM(elapsed_time.count(), ref_str.length() / 5.0)));
+    result.append("\n");
+    write_to_file(result);
+}
 
-float compare_accuracy(string reference, string answer){
+void run_total_runs(){
+    std::cout << get_num_runs() << std::endl;
+}
+
+void run_accuracy(){
+    std::cout << "Your average accuracy is: "  << get_avg_accuracy() << std::endl;
+}
+
+void run_wpm(){
+    std::cout << "Your average wpm is: "  << get_avg_wpm() << std::endl;
+}
+
+float compare_accuracy(std::string reference, std::string answer){
     int answer_length = answer.length();
     int reference_length = reference.length();
     int mistakes = 0;

@@ -1,19 +1,17 @@
-using namespace std;
-
 #include <string>
 #include <vector>
 #include <ctime>
 #include <cstdlib>
 #include <iostream>
 
-vector<string> words = {" Apple", " Banana", " Carrot", " Mango", " Apricot", " Pear", " Strawberry", " Blueberry", " Raspberry", " Orange", " Grapefruit", " Peach", " Nectarine", " Lime", " Pineapple", " Guava", " Watermelon", " Kiwi", " Cantaloupe"};
+std::vector<std::string> words = {" Apple", " Banana", " Carrot", " Mango", " Apricot", " Pear", " Strawberry", " Blueberry", " Raspberry", " Orange", " Grapefruit", " Peach", " Nectarine", " Lime", " Pineapple", " Guava", " Watermelon", " Kiwi", " Cantaloupe"};
 
-string generate_reference_string(){
+/* std::string generate_reference_string(){
     srand(time(0));
 
     int length = (rand() % 5) + 1;
 
-    string ref_string = "";
+    std::string ref_string = "";
 
     for(int i = 0; i < length; i++){
         int remove_index = rand() % words.size();
@@ -22,12 +20,16 @@ string generate_reference_string(){
     }
 
     return ref_string.substr(1);
-}
+} */
 
-string generate_reference_string(int num_times){
+std::string generate_reference_string(int num_times){
     srand(time(0));
 
-    string ref_string = "";
+    std::string ref_string = "";
+
+    if(num_times < 0){
+        num_times = (rand() % 5) + 1;
+    }
 
     for(int i = 0; i < num_times; i++){
         int remove_index = rand() % words.size();
