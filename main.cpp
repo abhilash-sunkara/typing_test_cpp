@@ -120,15 +120,17 @@ void run_typingtest(int num_words){
     getline(std::cin, ans_str);
     auto end = std::chrono::high_resolution_clock::now();
     const std::chrono::duration<double> elapsed_time = end - start;
-    float accuracy = compare_accuracy(ref_str, ans_str);
-    std::cout << "Your accuracy is: " << accuracy * 100 << "%, in " << elapsed_time.count() << "s" << std::endl;
-    std::cout << "Your calculated WPM is: " << getWPM(elapsed_time.count(), ref_str.length() / 5.0) << std::endl;
-    std::string result;
-    result.append(std::to_string(accuracy * 100));
+    float accuracy = compare_accuracy(ref_str, ans_str) * 100;
+    float wpm = getWPM(elapsed_time.count(), ref_str.length() / 5.0);
+    std::cout << "Your accuracy is: " << accuracy << "%, in " << elapsed_time.count() << "s" << std::endl;
+    std::cout << "Your calculated WPM is: " << wpm << std::endl;
+    write_to_json(accuracy, wpm);
+    /* std::string result;
+    result.append(std::to_string(accuracy));
     result.append(", ");
-    result.append(std::to_string(getWPM(elapsed_time.count(), ref_str.length() / 5.0)));
+    result.append(std::to_string(wpm));
     result.append("\n");
-    write_to_file(result);
+    write_to_file(result); */
 }
 
 void run_total_runs(){

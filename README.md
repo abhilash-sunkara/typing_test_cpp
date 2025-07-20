@@ -6,5 +6,6 @@ Planned features
 - Added functionality for full quotes from API service / expanded dictionary
 - Better accuracy calculation
 - WPM and accuracy graph plotting with morphologica 
-- Migrate local storage to .json instead of .txt for better searching / storage
 - Add colored output using termcolor
+
+Uses header files / libraries from [CLI11](https://github.com/CLIUtils/CLI11) and [nlohmann/json](https://github.com/nlohmann/json)
