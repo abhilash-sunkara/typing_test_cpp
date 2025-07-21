@@ -7,32 +7,45 @@
 #include "file_storage.cpp"
 #include "CLI11.hpp"
 
+enum run_type {API, QUOTE, NORMAL};
+
 float compare_accuracy(std::string, std::string);
 float getWPM(float, float);
 int is_num(std::string);
-void run_typingtest(int);
+void run_typingtest(int, run_type);
 void run_total_runs();
 void run_accuracy();
 void run_wpm();
 
-
+/*IMPORTANT : compile with these flags "-std=c++11 -lssl -lcrypto -lws2_32 -lcrypt32" or api call won't work*/
 int main(int argc, char* argv[]){
 
     CLI::App app{"Typing Test"};
 
     int num_words = -1;
+    bool api{false};
+    bool quote{false};
 
     auto run = app.add_subcommand("run", "Run a typing test");
     auto total_runs = app.add_subcommand("total_runs", "Get total number of typing test runs");
     auto accuracy = app.add_subcommand("accuracy", "Gets average accuracy from all typing test runs");
     auto wpm = app.add_subcommand("wpm", "Gets average wpm from all typing test runs");
+    /* auto api = app.add_subcommand("api", "Gets and outputs random word from word api"); */
 
     run->add_option("num_words", num_words, "Number of words to be used for typing test")->default_val(-1);
+    run->add_flag("-a", api, "Flag used to check for API request");
+    run->add_flag("-q", quote, "Flag used to check for quote request");
 
     CLI11_PARSE(app, argc, argv);
 
     if(*run){
-        run_typingtest(num_words);
+        if(api){
+            run_typingtest(num_words, API);
+        } else if(quote){
+            run_typingtest(num_words, QUOTE);
+        } else {
+            run_typingtest(num_words, NORMAL);
+        }
     } else if(*total_runs){
         run_total_runs();
     } else if(*accuracy){
@@ -112,8 +125,16 @@ int main(int argc, char* argv[]){
     } */
 } 
 
-void run_typingtest(int num_words){
-    std::string ref_str = generate_reference_string(num_words);
+void run_typingtest(int num_words, run_type rt){
+
+    std::string ref_str;
+    if(rt == API){
+        ref_str = generate_reference_string_api(num_words);
+    } else if (rt == QUOTE){
+        ref_str = generate_reference_quote();
+    } else {
+        std::string ref_str = generate_reference_string(num_words);
+    }
     std::cout << "Your sentence is: " << ref_str << std::endl;
     std::string ans_str;
     auto start = std::chrono::high_resolution_clock::now();
